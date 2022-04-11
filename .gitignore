@@ -20,4 +20,8 @@ xtend-gen/
 *.emftvm
 
 # Maven
-target/
+target
+
+#InteliJ
+.idea/
+.idea/*

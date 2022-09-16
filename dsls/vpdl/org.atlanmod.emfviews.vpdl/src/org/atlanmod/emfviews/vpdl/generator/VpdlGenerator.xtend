@@ -82,65 +82,53 @@ class VpdlGenerator extends AbstractGenerator {
   }
 
   def CharSequence compileEviewpoint(Resource r, IFileSystemAccess2 fsa) '''
-    contributingMetamodels=Â«r.getListMetamodels.map([m | m.name + '::' + m.nsURI]).join(',')Â»
-    weavingModel=Â«viewpointName(r)Â».xmi
+    contributingMetamodels=«r.getListMetamodels.map([m | m.name + '::' + m.nsURI]).join(',')»
+    weavingModel=«viewpointName(r)».xmi
   '''
 
   def CharSequence compileEcl(Resource resource) '''
-    Â«FOR r : resource.allRulesÂ»
-    rule Â«r.relation.nameÂ»
-    match s : Â«r.relation.metamodel.nameÂ»!Â«r.relation.class_.nameÂ»
-    with  t : Â«r.relation.metamodelRight.nameÂ»!Â«r.relation.classRight.nameÂ»
+    «FOR r : resource.allRules»
+    rule «r.relation.name»
+    match s : «r.relation.metamodel.name»!«r.relation.class_.name»
+    with  t : «r.relation.metamodelRight.name»!«r.relation.classRight.name»
     {
       compare
       {
-        return Â«r.condition.prettyPrintÂ»;
+        return «r.condition.prettyPrint»;
       }
     }
-    Â«ENDFORÂ»
+    «ENDFOR»
   '''
-
   def String compileXmi(Resource r) {
     val factory = EmftvmFactory.eINSTANCE
     val rs = new ResourceSetImpl()
-
     val env = factory.createExecEnv()
-
     // Load metamodels
     val sourceMM = factory.createMetamodel()
     sourceMM.resource = rs.getResource(URI.createURI("http://www.atlanmod.org/emfviews/vpdl/0.3.0"), true)
     env.registerMetaModel("VPDL", sourceMM)
-
     val targetMM = factory.createMetamodel()
     targetMM.resource = rs.getResource(URI.createURI("http://www.atlanmod.org/emfviews/virtuallinks/0.3.0"), true)
     env.registerMetaModel("VirtualLinks", targetMM)
-
     // Load models
     val sourceModel = factory.createModel()
     sourceModel.resource = r
     env.registerInputModel("IN", sourceModel)
-
     val targetModel = factory.createModel()
     // The URI does not actually matter here, as we save the resource to a String
     targetModel.resource = rs.createResource(URI.createFileURI("foo.xmi"))
     env.registerOutputModel("OUT", targetModel)
-
     // Run the transformation
     val mr = new DefaultModuleResolver("platform:/plugin/org.atlanmod.emfviews.vpdl/transformation/",
       new ResourceSetImpl())
-
     env.loadModule(mr, "VPDL2VirtualLinks")
     env.run(null)
-
     // Write to a String and return
     val out = new ByteArrayOutputStream()
     targetModel.resource.save(out, null)
-
     out.toString
   }
-
   // Pretty printer for boolean expressions of the WHERE clause
-
   def CharSequence prettyPrint(BoolExpr expr) {
     if (expr instanceof Constant)
       return expr.prettyPrint();
@@ -150,7 +138,6 @@ class VpdlGenerator extends AbstractGenerator {
       return expr.prettyPrint();
     throw new IllegalArgumentException();
   }
-
   def CharSequence prettyPrint(Constant c) {
     if (c instanceof IntLiteral)
       return c.value.toString();
@@ -159,9 +146,7 @@ class VpdlGenerator extends AbstractGenerator {
      if (c instanceof StringLiteral)
       return c.value;
   }
-
-  def CharSequence prettyPrint(Comparison c) '''Â«c.left.prettyPrintÂ» Â«c.op.prettyPrintÂ» Â«c.right.prettyPrintÂ»'''
-
+  def CharSequence prettyPrint(Comparison c) '''«c.left.prettyPrint» «c.op.prettyPrint» «c.right.prettyPrint»'''
   def CharSequence prettyPrint(BoolOp op) {
     return switch (op) {
       case BoolOp.EQ: '='
@@ -174,30 +159,22 @@ class VpdlGenerator extends AbstractGenerator {
       case BoolOp.OR: 'or'
     }
   }
-
-  def CharSequence prettyPrint(Nav n) '''Â«n.startÂ»Â«FOR b : n.bodyÂ».Â«b.prettyPrintÂ»Â«ENDFORÂ»'''
-
+  def CharSequence prettyPrint(Nav n) '''«n.start»«FOR b : n.body».«b.prettyPrint»«ENDFOR»'''
   def CharSequence prettyPrint(NavRest r) {
     if (r instanceof NavFeature)
       return r.prettyPrint();
     if (r instanceof MethodCall)
       return r.prettyPrint();
   }
-
   def CharSequence prettyPrint(NavFeature f) {
     f.name
   }
-
-  def CharSequence prettyPrint(MethodCall m) '''Â«m.methodÂ»(Â«FOR a : m.argsÂ»Â«a.prettyPrintÂ»Â«ENDFORÂ»)'''
-
+  def CharSequence prettyPrint(MethodCall m) '''«m.method»(«FOR a : m.args»«a.prettyPrint»«ENDFOR»)'''
   def CharSequence prettyPrint(MethodArg a) {
     if (a instanceof BoolExpr)
       return a.prettyPrint
     if (a instanceof Lambda)
       return a.prettyPrint
   }
-
-  def CharSequence prettyPrint(Lambda l) '''Â«l.argÂ» | Â«l.body.prettyPrintÂ»'''
-
-
+  def CharSequence prettyPrint(Lambda l) '''«l.arg» | «l.body.prettyPrint»'''
 }

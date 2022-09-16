@@ -38,6 +38,12 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.emf.ecore.InternalEObject;
+import org.eclipse.emf.ecore.impl.EAnnotationImpl;
+import org.eclipse.emf.ecore.impl.EModelElementImpl;
+import org.eclipse.emf.ecore.impl.EOperationImpl;
+import org.eclipse.emf.ecore.impl.EStringToStringMapEntryImpl;
+import org.eclipse.emf.ecore.impl.ETypedElementImpl;
+import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
@@ -359,14 +365,21 @@ public class Viewpoint implements EcoreVirtualizer {
       if (whitelist) {
         EObject e = base;
         while (e != null) {
-          ((BaseVirtualElement<?>) getVirtualGeneric(e)).filtered = true;
+          BaseVirtualElement<?> generic = (BaseVirtualElement<?>) getVirtualGeneric(e);
+      	  if (generic != null) {
+      		generic.filtered = true;
+      	  }
           e = e.eContainer();
         }
       }
 
       // Now go over each elements to be filtered, and flip their filtered bit
       for (EObject e : filteredElements) {
-        ((BaseVirtualElement<?>) getVirtualGeneric(e)).filtered = true;
+    
+    	  BaseVirtualElement<?> generic = (BaseVirtualElement<?>) getVirtualGeneric(e);
+    	  if (generic != null) {
+    		generic.filtered = true;
+    	  }
       }
     }
   }
@@ -582,7 +595,9 @@ public class Viewpoint implements EcoreVirtualizer {
   }
 
   protected EObject getVirtualGeneric(EObject o) {
-    if (o == null) return null;
+    if (
+    		o == null 
+    	) {return null;}
     if (o instanceof EPackage) return getVirtual((EPackage) o);
     if (o instanceof EClass) return getVirtual((EClass) o);
     if (o instanceof EDataType) return getVirtual((EDataType) o);

@@ -51,8 +51,8 @@ class MelGenerator extends AbstractGenerator {
   }
 
   def CharSequence compileEviewpoint(Resource r, IFileSystemAccess2 fsa) '''
-    contributingMetamodels=Â«r.getAllMetamodels.map([m | m.nsURI]).join(',')Â»
-    weavingModel=Â«extensionName(r)Â».xmi
+    contributingMetamodels=«r.getAllMetamodels.map([m | m.nsURI]).join(',')»
+    weavingModel=«extensionName(r)».xmi
   '''
 
   def String compileXMI(Resource r) {

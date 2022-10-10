@@ -359,15 +359,21 @@ public class Viewpoint implements EcoreVirtualizer {
       if (whitelist) {
         EObject e = base;
         while (e != null) {
-          ((BaseVirtualElement<?>) getVirtualGeneric(e)).filtered = true;
+          BaseVirtualElement<?> generic = (BaseVirtualElement<?>) getVirtualGeneric(e);
+      	  if (generic != null) {
+      		generic.filtered = true;
+      	  }
           e = e.eContainer();
         }
       }
 
       // Now go over each elements to be filtered, and flip their filtered bit
       for (EObject e : filteredElements) {
-        ((BaseVirtualElement<?>) getVirtualGeneric(e)).filtered = true;
-      }
+        BaseVirtualElement<?> generic = (BaseVirtualElement<?>) getVirtualGeneric(e);
+        if (generic != null) {
+	  		generic.filtered = true;
+	  	  }
+      	}
     }
   }
 
@@ -582,7 +588,9 @@ public class Viewpoint implements EcoreVirtualizer {
   }
 
   protected EObject getVirtualGeneric(EObject o) {
-    if (o == null) return null;
+	if (o == null ) {
+		return null;
+	}
     if (o instanceof EPackage) return getVirtual((EPackage) o);
     if (o instanceof EClass) return getVirtual((EClass) o);
     if (o instanceof EDataType) return getVirtual((EDataType) o);

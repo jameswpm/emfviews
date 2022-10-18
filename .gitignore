@@ -23,12 +23,6 @@ xtend-gen/
 *.emftvm
 
 ##
-## IntelliJ IDEA Files
-##
-*.iml
-.idea
-
-##
 ## Visio Studio Code files
 ##
 .vscode/
@@ -36,7 +30,15 @@ xtend-gen/
 ##
 ## Maven Files
 ##
-target/
+target
+
+##
+## IntelliJ IDEA Files
+##
+*.iml
+.idea
+.idea/
+.idea/*
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup

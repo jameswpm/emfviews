@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.StringJoiner;
 
+import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EClassifier;
@@ -32,12 +33,15 @@ import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EEnum;
 import org.eclipse.emf.ecore.EGenericType;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.emf.ecore.EPackage;
+import org.eclipse.emf.ecore.EParameter;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.emf.ecore.InternalEObject;
+import org.eclipse.emf.ecore.impl.EStringToStringMapEntryImpl;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
@@ -594,7 +598,15 @@ public class Viewpoint implements EcoreVirtualizer {
 	}
 
 	protected EObject getVirtualGeneric(EObject o) {
-		if (o == null) {
+		//ignore null objects and also some objects not useful for views, like EAnnotations, EOperations and EParameters for example
+		if (
+				o == null 
+				|| o instanceof EAnnotation
+				|| o instanceof EOperation
+				|| o instanceof EParameter
+				|| o instanceof EStringToStringMapEntryImpl
+			) 
+		{
 			return null;
 		}
 		if (o instanceof EPackage)
